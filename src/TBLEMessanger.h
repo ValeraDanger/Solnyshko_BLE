@@ -26,6 +26,7 @@ private:
 public:
     TBLEMessanger() : request(100) {}
 
+    bool deviceConnected = false;
     bool available = false;
     void init();
 

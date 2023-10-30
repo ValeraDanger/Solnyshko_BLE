@@ -6,6 +6,8 @@ void TBLEMessanger::init() {
     BLEDevice::init(BLE_NAME);
     pServer = BLEDevice::createServer();
 
+    pServer->setCallbacks(new MyServerCallbacks());
+
     pService = pServer->createService(SERVICE_UUID);
 
     pCharacteristic = pService->createCharacteristic(
@@ -14,12 +16,12 @@ void TBLEMessanger::init() {
                                             BLECharacteristic::PROPERTY_WRITE
                                         );
 
-    pCharacteristic->setCallbacks(new MyCallbacks());
+    pCharacteristic->setCallbacks(new MyCharacteristicCallbacks());
 
     pCharacteristic->setValue("Hello, world!");
     pService->start();
 
-    BLEAdvertising *pAdvertising = pServer->getAdvertising();
+    pAdvertising = pServer->getAdvertising();
     pAdvertising->start();
 
     Serial.println("BLE server started!");

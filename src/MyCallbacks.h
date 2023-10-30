@@ -7,7 +7,7 @@
 extern DynamicJsonDocument status;
 extern TaskHandle_t proccessCommandTaskHandler;
 
-class MyCallbacks: public BLECharacteristicCallbacks {
+class MyCharacteristicCallbacks: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
         std::string value = pCharacteristic->getValue();
         deserializeJson(BLEMessanger.getRequest(), value);
@@ -23,5 +23,19 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
         serializeJson(status, value);
         pCharacteristic->setValue(value);
+    }
+
+};
+
+class MyServerCallbacks : public BLEServerCallbacks {
+    void onConnect(BLEServer* pServer) {
+        BLEMessanger.deviceConnected = true;
+        Serial.println("Device connected!");
+    }
+
+    void onDisconnect(BLEServer* pServer) {
+        BLEMessanger.deviceConnected = false;
+        Serial.println("Device disconnected!");
+        pServer->getAdvertising()->start();
     }
 };
