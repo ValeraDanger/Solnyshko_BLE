@@ -21,7 +21,11 @@ void TBLEMessanger::init() {
     pCharacteristic->setValue("Hello, world!");
     pService->start();
 
+    BLEAdvertisementData oAdvertisementData = BLEAdvertisementData();
+    oAdvertisementData.setManufacturerData("SNSolnyshko OYFB-04M");  //Where 2 first bytes convert into Reserved manufactorer id;
+
     pAdvertising = pServer->getAdvertising();
+    pAdvertising->setAdvertisementData(oAdvertisementData);
     pAdvertising->start();
 
     Serial.println("BLE server started!");
