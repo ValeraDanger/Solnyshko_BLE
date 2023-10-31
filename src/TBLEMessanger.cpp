@@ -1,5 +1,7 @@
 #include "TBLEMessanger.h"
 #include "MyCallbacks.h"
+#include <Arduino.h>
+
 
 void TBLEMessanger::init() {
 
@@ -10,25 +12,35 @@ void TBLEMessanger::init() {
 
     pService = pServer->createService(SERVICE_UUID);
 
-    pCharacteristic = pService->createCharacteristic(
-                                            CHARACTERISTIC_UUID,
+    pRWCharacteristic = pService->createCharacteristic(
+                                            RW_CHARACTERISTIC_UUID,
                                             BLECharacteristic::PROPERTY_READ |
                                             BLECharacteristic::PROPERTY_WRITE
                                         );
+    pRWCharacteristic->setCallbacks(new MyCharacteristicCallbacks());
 
-    pCharacteristic->setCallbacks(new MyCharacteristicCallbacks());
+    pNotifyCharacteristic = pService->createCharacteristic(
+                                            NF_CHARACTERISTIC_UUID,
+                                            BLECharacteristic::PROPERTY_NOTIFY
+                                        );
 
-    pCharacteristic->setValue("Hello, world!");
+    pNotifyCharacteristic->addDescriptor(new BLE2902());
+
     pService->start();
 
     BLEAdvertisementData oAdvertisementData = BLEAdvertisementData();
-    oAdvertisementData.setManufacturerData("SNSolnyshko OYFB-04M");  //Where 2 first bytes convert into Reserved manufactorer id;
+    oAdvertisementData.setManufacturerData("SNSolnyshko OYFB-04M");         //Where 2 first bytes convert into Reserved manufactorer id;
 
     pAdvertising = pServer->getAdvertising();
     pAdvertising->setAdvertisementData(oAdvertisementData);
     pAdvertising->start();
 
     Serial.println("BLE server started!");
+}
+
+void TBLEMessanger::notifyStateChanges() {
+    this->pNotifyCharacteristic->setValue("CHNG");  // 
+    this->pNotifyCharacteristic->notify();
 }
 
 DynamicJsonDocument& TBLEMessanger::getRequest() {

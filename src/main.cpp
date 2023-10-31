@@ -17,6 +17,7 @@ void timerController(void* pvParams) {
 
     Preheater.start();
     status["state"] = LampState::PREHEATING;
+    BLEMessanger.notifyStateChanges();
     while (!Preheater.tick()) {       //while timer is not ended
       vTaskDelay(5);
     }
@@ -25,11 +26,14 @@ void timerController(void* pvParams) {
     Timer.setTime(time);
     Timer.start();
     status["state"] = LampState::ACTIVE;
+    BLEMessanger.notifyStateChanges();
+
     while (!Timer.tick()) {       //while timer is not ended
       vTaskDelay(5);
     }
     Timer.stop();
     status["state"] = LampState::OFF; 
+    BLEMessanger.notifyStateChanges();
 
     timerControllerTaskHandler = NULL;
     vTaskDelete(NULL);
@@ -84,23 +88,18 @@ void proccessCommand(void* pvParams) {
     else if ( !strcmp(object.key().c_str(), "timer") ) {
 
       if ( !strcmp(command["timer"]["action"], "set") ) {
-        Serial.println("1");
         uint32_t time = command["timer"]["time"].as<uint32_t>();
-        Serial.println("2");
         if (timerControllerTaskHandler != NULL) {
-          Serial.println("3");
           vTaskDelete(timerControllerTaskHandler);
           timerControllerTaskHandler = NULL;
-          Serial.println("4");
         }
-        Serial.println("5");
         Preheater.stop();
         Timer.stop();
 
         xTaskCreate(
           timerController,   /* Task method pointer*/
           "Timer pipeline controll task",          /* Task name*/
-          1000,                       /* Stack deepth*/
+          10000,                       /* Stack deepth*/
           &time,               /* Pointer on class object itself */
           2,                                  /* Priority*/
           &timerControllerTaskHandler                       /* Task handle*/
