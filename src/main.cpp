@@ -9,34 +9,51 @@
 
 DynamicJsonDocument status(200);
 
-
+void changeLampState(int state) {
+  status["state"] = state;
+  BLEMessanger.notifyStateChanges();
+}
 
 TaskHandle_t timerControllerTaskHandler;
 void timerController(void* pvParams) {
-    uint32_t time = *((uint32_t*)pvParams);
 
-    Preheater.start();
-    status["state"] = LampState::PREHEATING;
-    BLEMessanger.notifyStateChanges();
-    while (!Preheater.tick()) {       //while timer is not ended
-      vTaskDelay(5);
+  DynamicJsonDocument& command = *(DynamicJsonDocument*)pvParams;  //transform pointer into link
+  uint32_t cycle_time = command["timer"]["time"].as<uint32_t>();
+  uint32_t cycles_num = command["timer"]["cycles"].as<uint32_t>();
+
+  status["timer"]["cycles"] = cycles_num;
+  status["timer"]["cycle_time"] = cycle_time;
+
+  Preheater.start();
+  changeLampState(LampState::PREHEATING);
+  while (!Preheater.tick()) {       //while timer is not ended
+    vTaskDelay(5);
+  }
+  Preheater.stop();
+
+  uint32_t total_cycles_time_left = cycle_time * cycles_num;
+  Timer.setTime(total_cycles_time_left);
+  total_cycles_time_left -= cycle_time;
+  Timer.start();
+  changeLampState(LampState::ACTIVE);
+
+  while (!Timer.tick()) {       //while timer is not ended
+    vTaskDelay(5);
+
+    if (Timer.getTime() < total_cycles_time_left) {
+      Timer.pause();
+      changeLampState(LampState::PAUSED);                       //pause lamp when cycle ends
+      total_cycles_time_left -= cycle_time;
     }
-    Preheater.stop();
+  }
+  Timer.stop();
+  changeLampState(LampState::OFF);
 
-    Timer.setTime(time);
-    Timer.start();
-    status["state"] = LampState::ACTIVE;
-    BLEMessanger.notifyStateChanges();
+  status["timer"]["cycles"] = 0;
+  status["timer"]["cycle_time"] = 0;
 
-    while (!Timer.tick()) {       //while timer is not ended
-      vTaskDelay(5);
-    }
-    Timer.stop();
-    status["state"] = LampState::OFF; 
-    BLEMessanger.notifyStateChanges();
-
-    timerControllerTaskHandler = NULL;
-    vTaskDelete(NULL);
+  timerControllerTaskHandler = NULL;
+  vTaskDelete(NULL);
 }
 
 
@@ -65,8 +82,6 @@ void proccessCommand(void* pvParams) {
         Timer.stop();
 
         Relay.turnOn();
-
-        status["state"] = LampState::ON;
         
       }
 
@@ -81,14 +96,13 @@ void proccessCommand(void* pvParams) {
 
         Relay.turnOff();
         
-        status["state"] = LampState::OFF;
       }
     }
 
     else if ( !strcmp(object.key().c_str(), "timer") ) {
 
       if ( !strcmp(command["timer"]["action"], "set") ) {
-        uint32_t time = command["timer"]["time"].as<uint32_t>();
+        //uint32_t time = command["timer"]["time"].as<uint32_t>();
         if (timerControllerTaskHandler != NULL) {
           vTaskDelete(timerControllerTaskHandler);
           timerControllerTaskHandler = NULL;
@@ -100,7 +114,7 @@ void proccessCommand(void* pvParams) {
           timerController,   /* Task method pointer*/
           "Timer pipeline controll task",          /* Task name*/
           10000,                       /* Stack deepth*/
-          &time,               /* Pointer on class object itself */
+          &command,               /* Pointer on class object itself */
           2,                                  /* Priority*/
           &timerControllerTaskHandler                       /* Task handle*/
         ); 
@@ -114,8 +128,9 @@ void proccessCommand(void* pvParams) {
         }
         Preheater.stop();
         Timer.stop();
-        status["state"] = LampState::OFF;
 
+        status["timer"]["cycles"] = 0;
+        status["timer"]["cycle_time"] = 0;
       }
 
       else if ( !strcmp(command["timer"]["action"], "pause") ) { 
@@ -124,7 +139,6 @@ void proccessCommand(void* pvParams) {
           //   vTaskSuspend(timerControllerTaskHandler);
           // }
           Timer.pause();
-          status["state"] = LampState::PAUSED;
         } 
       }
 
@@ -134,7 +148,7 @@ void proccessCommand(void* pvParams) {
           //   vTaskResume(timerControllerTaskHandler);
           // }
           Timer.resume();
-          status["state"] = LampState::ACTIVE;
+          changeLampState(LampState::ACTIVE);
         }
       }
     }
@@ -146,6 +160,8 @@ void setup() {
 
   status["state"] = LampState::OFF;
   status["timer"]["time_left"] = 0;
+  status["timer"]["cycles"] = 0;
+  status["timer"]["cycle_time"] = 0;
   status["preheat"]["time_left"] = 0;
 
   Relay.init();
