@@ -7,7 +7,7 @@
 extern DynamicJsonDocument status;
 
 void TPreheater::start() {
-    Timer.stop();
+    //Timer.stop();
     this->tmr.setTime(PREHEAT_TIME); 
     Relay.turnOn();
     this->tmr.start();

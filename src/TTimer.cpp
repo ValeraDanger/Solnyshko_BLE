@@ -7,7 +7,7 @@
 extern DynamicJsonDocument status;
 
 void TTimer::start() {
-    Preheater.stop();
+    //Preheater.stop();
     Relay.turnOn();
     this->tmr.start();
     Serial.println("Timer started");
@@ -17,6 +17,8 @@ void TTimer::stop() {
     Relay.turnOff();
     this->tmr.stop();
     this->setTime(0);
+    status["timer"]["cycles"] = 0;
+    status["timer"]["cycle_time"] = 0;
     Serial.println("Timer stoped");
 }
 

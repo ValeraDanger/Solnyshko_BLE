@@ -49,8 +49,8 @@ void timerController(void* pvParams) {
   Timer.stop();
   changeLampState(LampState::OFF);
 
-  status["timer"]["cycles"] = 0;
-  status["timer"]["cycle_time"] = 0;
+  // status["timer"]["cycles"] = 0;
+  // status["timer"]["cycle_time"] = 0;
 
   timerControllerTaskHandler = NULL;
   vTaskDelete(NULL);
@@ -82,6 +82,8 @@ void proccessCommand(void* pvParams) {
         Timer.stop();
 
         Relay.turnOn();
+
+        status["state"] = LampState::ON;
         
       }
 
@@ -95,6 +97,8 @@ void proccessCommand(void* pvParams) {
         Timer.stop();
 
         Relay.turnOff();
+
+        status["state"] = LampState::OFF;
         
       }
     }
