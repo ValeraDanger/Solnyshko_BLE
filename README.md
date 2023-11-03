@@ -25,20 +25,21 @@ For command sending, you should make write request into `beb5483e-36e1-4688-b7f5
 `{"relay": 1 / 0}` : on and off relay
 
 ### Timer control:
-    {"timer": {
-        "action" : "...",
-        "time" : 10000,
-        "cycles" : 3
-      }}
+    {
+        "timer": {
+            "action" : "...",
+            "time" : 10000,
+            "cycles" : 3 }
+     }
   
 `action` : 
-- `"set"` : start timer on specified milliseconds (not including preheat)
+- `"set"` : start timer on specified duration and cycles count (not including preheat). **Take attention**: this command starts **full** procedure, including preheating and and separate cycles, divided timer pauses. 
 - `"stop"` : stop timer and return lamp into `OFF` state
 - `"pause"` : pause timer (only works when `PAUSED` lamp state)
 - `"resume"` : resume timer (only works when `ACTIVE` lamp state)
 
 
-`time` : single cycle time
+`time` : single cycle time, ms
 
 `cycles` : number of cycles
 
@@ -51,3 +52,27 @@ For command sending, you should make write request into `beb5483e-36e1-4688-b7f5
  
 # Status responses
 **Status response** - is a JSON response on client's read request consisting off full device status. For requesting status, you should make read request `beb5483e-36e1-4688-b7f5-ea07361b26a8` characteristic. You will recive response in this form:
+
+    {
+        "state": 0-4,
+        "timer": {
+            "time_left":15000,
+            "cycles":3,
+            "cycle_time":5000 },
+        "preheat": {
+            "time_left":0 }
+    }
+    
+- `state` : common device state
+    0) `OFF`,
+    1)   `ON`,
+    2)   `PREHEATING`,
+    3)   `ACTIVE`,
+    4)   `PAUSED`
+- `timer` : timer parameters
+    - `time_left` : total cycles duration left, ms
+    - `cycles` : number of procedure cycles
+    - `cycle_time` : single procedure cycle duration, ms
+
+- `preheat` : preheat parameters
+    - `time_left` : preheating duration left, ms
