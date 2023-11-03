@@ -83,7 +83,7 @@ void proccessCommand(void* pvParams) {
 
         Relay.turnOn();
 
-        status["state"] = LampState::ON;
+        changeLampState(LampState::ON);
         
       }
 
@@ -98,7 +98,7 @@ void proccessCommand(void* pvParams) {
 
         Relay.turnOff();
 
-        status["state"] = LampState::OFF;
+        changeLampState(LampState::OFF);  
         
       }
     }
@@ -133,24 +133,18 @@ void proccessCommand(void* pvParams) {
         Preheater.stop();
         Timer.stop();
 
-        status["timer"]["cycles"] = 0;
-        status["timer"]["cycle_time"] = 0;
+        changeLampState(LampState::OFF);  
       }
 
       else if ( !strcmp(command["timer"]["action"], "pause") ) { 
         if (status["state"].as<int>() == LampState::ACTIVE) {
-          // if (timerControllerTaskHandler != NULL) {
-          //   vTaskSuspend(timerControllerTaskHandler);
-          // }
           Timer.pause();
+          changeLampState(LampState::PAUSED); 
         } 
       }
 
       else if ( !strcmp(command["timer"]["action"], "resume") ) { 
         if (status["state"].as<int>() == LampState::PAUSED) {
-          // if (timerControllerTaskHandler != NULL) {
-          //   vTaskResume(timerControllerTaskHandler);
-          // }
           Timer.resume();
           changeLampState(LampState::ACTIVE);
         }
