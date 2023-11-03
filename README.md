@@ -33,7 +33,7 @@ For command sending, you should make write request into `beb5483e-36e1-4688-b7f5
      }
   
 `action` : 
-- `"set"` : start timer on specified duration and cycles count (not including preheat). **Take attention**: this command starts **full** procedure, including preheating and and separate cycles, divided timer pauses. 
+- `"set"` : start preheat and timer on specified duration and cycles count. **Take attention**: this command starts **full** procedure, including preheating and and separate cycles, divided timer pauses. 
 - `"stop"` : stop timer and return lamp into `OFF` state
 - `"pause"` : pause timer (only works when `PAUSED` lamp state)
 - `"resume"` : resume timer (only works when `ACTIVE` lamp state)
