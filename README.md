@@ -64,11 +64,11 @@ For command sending, you should make write request into `beb5483e-36e1-4688-b7f5
     }
     
 - `state` : common device state
-    0) `OFF`,
-    1)   `ON`,
-    2)   `PREHEATING`,
-    3)   `ACTIVE`,
-    4)   `PAUSED`
+    - `0` : `OFF`,
+    - `1` : `ON`,
+    - `2` : `PREHEATING`,
+    - `3` : `ACTIVE`,
+    - `4` : `PAUSED`
 - `timer` : timer parameters
     - `time_left` : total cycles duration left, ms
     - `cycles` : number of procedure cycles
