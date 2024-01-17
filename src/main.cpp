@@ -5,6 +5,7 @@
 #include "TRelay.h"
 #include "TPreheater.h"
 #include "TTimer.h"
+#include "TBuzzer.h"
 
 
 DynamicJsonDocument status(200);
@@ -37,6 +38,9 @@ void timerController(void* pvParams) {
   Timer.start();
   changeLampState(LampState::ACTIVE);
 
+  Timer.pause();
+  changeLampState(LampState::PAUSED);         //pause timer after preheating
+
   while (!Timer.tick()) {       //while timer is not ended
     vTaskDelay(5);
 
@@ -48,9 +52,7 @@ void timerController(void* pvParams) {
   }
   Timer.stop();
   changeLampState(LampState::OFF);
-
-  // status["timer"]["cycles"] = 0;
-  // status["timer"]["cycle_time"] = 0;
+  Buzzer.pauseBeep();
 
   timerControllerTaskHandler = NULL;
   vTaskDelete(NULL);
@@ -155,6 +157,8 @@ void proccessCommand(void* pvParams) {
 
 void setup() {
   Serial.begin(115200);
+
+  Buzzer.pauseBeep();
 
   status["state"] = LampState::OFF;
   status["timer"]["time_left"] = 0;

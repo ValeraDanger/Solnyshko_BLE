@@ -3,6 +3,7 @@
 #include "TPreheater.h"
 #include "LampStates.h"
 #include "TRelay.h"
+#include "TBuzzer.h"
 
 extern DynamicJsonDocument status;
 
@@ -38,6 +39,7 @@ uint32_t TTimer::getTime() {
 void TTimer::pause() {
     this->tmr.stop();
     status["timer"]["time_left"] = this->tmr.timeLeft();
+    Buzzer.pauseBeep();
     Serial.println("Timer paused");
 }
 
