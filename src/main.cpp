@@ -58,6 +58,32 @@ void timerController(void* pvParams) {
   vTaskDelete(NULL);
 }
 
+TaskHandle_t inactivityTimerControllerTaskHandler;
+//TaskHandle_t* p_inactivityTimerControllerTaskHandler = &inactivityTimerControllerTaskHandler;
+void inactivityTimerController(void* pvParams) {
+
+  while (!Timer.inactivity_tmr.tick()) {
+    vTaskDelay(5);
+  }
+
+  if (timerControllerTaskHandler != NULL) {
+    vTaskDelete(timerControllerTaskHandler);
+    timerControllerTaskHandler = NULL;
+  }
+  Preheater.stop();
+  Timer.stop();
+
+  changeLampState(LampState::OFF); 
+  Serial.println("Lamp off caused by inactivity");
+
+  Timer.inactivity_tmr.stop();
+  Timer.inactivity_tmr.setTime(0);
+  Serial.println("Inactivity timer stoped");
+
+  inactivityTimerControllerTaskHandler = NULL;
+  vTaskDelete(NULL);
+}
+
 
 TaskHandle_t proccessCommandTaskHandler;
 void proccessCommand(void* pvParams) {
@@ -75,16 +101,16 @@ void proccessCommand(void* pvParams) {
       int state = command["relay"].as<int>();
 
       if (state == LampState::ON) {
-
         if (timerControllerTaskHandler != NULL) {
           vTaskDelete(timerControllerTaskHandler);
           timerControllerTaskHandler = NULL;
         }
+        Timer.inactivity_stop();
         Preheater.stop();
         Timer.stop();
 
         Relay.turnOn();
-
+        
         changeLampState(LampState::ON);
         
       }
@@ -95,6 +121,7 @@ void proccessCommand(void* pvParams) {
           vTaskDelete(timerControllerTaskHandler);
           timerControllerTaskHandler = NULL;
         }
+        //Timer.inactivity_stop();
         Preheater.stop();
         Timer.stop();
 
@@ -113,6 +140,7 @@ void proccessCommand(void* pvParams) {
           vTaskDelete(timerControllerTaskHandler);
           timerControllerTaskHandler = NULL;
         }
+        Timer.inactivity_stop();
         Preheater.stop();
         Timer.stop();
 
@@ -132,6 +160,7 @@ void proccessCommand(void* pvParams) {
           vTaskDelete(timerControllerTaskHandler);
           timerControllerTaskHandler = NULL;
         }
+        Timer.inactivity_stop();
         Preheater.stop();
         Timer.stop();
 
