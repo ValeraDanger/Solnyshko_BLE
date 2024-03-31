@@ -12,6 +12,7 @@ void TBLEMessanger::init() {
 
     pService = pServer->createService(SERVICE_UUID);
 
+
     pRWCharacteristic = pService->createCharacteristic(
                                             RW_CHARACTERISTIC_UUID,
                                             BLECharacteristic::PROPERTY_READ |
@@ -19,11 +20,18 @@ void TBLEMessanger::init() {
                                         );
     pRWCharacteristic->setCallbacks(new MyCharacteristicCallbacks());
 
+
+    pRWCharacteristic = pService->createCharacteristic(
+                                            VERSION_CHARACTERISTIC_UUID,
+                                            BLECharacteristic::PROPERTY_READ
+                                        );
+    pRWCharacteristic->setCallbacks(new VersionCharacteristicCallbacks());
+
+
     pNotifyCharacteristic = pService->createCharacteristic(
                                             NF_CHARACTERISTIC_UUID,
                                             BLECharacteristic::PROPERTY_NOTIFY
                                         );
-
     pNotifyCharacteristic->addDescriptor(new BLE2902());
 
     pService->start();

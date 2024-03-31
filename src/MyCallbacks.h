@@ -4,6 +4,9 @@
 #include "TPreheater.h"
 #include "TTimer.h"
 
+#define VERSION "1.0"
+
+
 extern DynamicJsonDocument status;
 extern TaskHandle_t proccessCommandTaskHandler;
 
@@ -24,7 +27,12 @@ class MyCharacteristicCallbacks: public BLECharacteristicCallbacks {
         serializeJson(status, value);
         pCharacteristic->setValue(value);
     }
+};
 
+class VersionCharacteristicCallbacks: public BLECharacteristicCallbacks {
+    void onRead(BLECharacteristic *pCharacteristic) {
+        pCharacteristic->setValue(VERSION);
+    }
 };
 
 class MyServerCallbacks : public BLEServerCallbacks {
