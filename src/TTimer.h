@@ -2,7 +2,7 @@
 
 #include "TAbstractTimer.h"
 
-#define INACTIVITY_TIME 15000  //Max inactivity time, ms
+#define INACTIVITY_TIME 150000  //Max inactivity time, ms
 
 class TTimer : public TAbstractTimer{
 private:

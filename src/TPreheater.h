@@ -2,7 +2,7 @@
 
 #include "TAbstractTimer.h"
 
-#define PREHEAT_TIME 10000
+#define PREHEAT_TIME 60000
 
 class TPreheater : public TAbstractTimer{
 public:
