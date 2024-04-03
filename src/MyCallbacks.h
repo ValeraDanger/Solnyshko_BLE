@@ -4,7 +4,7 @@
 #include "TPreheater.h"
 #include "TTimer.h"
 
-#define VERSION "1.0"
+#define VERSION "{\"version\":\"1.0\"}"
 
 
 extern DynamicJsonDocument status;
