@@ -6,14 +6,17 @@ Project works over BLE. After power on device starts BLE advertising. Manufacter
 
 Service UUID: `4fafc201-1fb5-459e-8fcc-c5c9c331914b`
 
-Service contains two characteristics:   
+Service contains following characteristics:   
 - `beb5483e-36e1-4688-b7f5-ea07361b26a8`
     - PROPERTY_READ
     - PROPERTY_WRITE
     - Is used to send commands and request device status
-- `1fd32b0a-aa51-4e49-92b2-9a8be97473c9` : on and off relay
+- `1fd32b0a-aa51-4e49-92b2-9a8be97473c9`
     - PROPERTY_NOTIFY
     - Is used to notify client about device status changes. Perceive notify as signal to renew local status.
+- `b3103938-3c4c-4330-8f56-e58c77f4b0bd`
+    - PROPERTY_READ
+    - Is used to read firmware version.
 
 # Commands
 
