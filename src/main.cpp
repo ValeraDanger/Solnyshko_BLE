@@ -38,6 +38,8 @@ void timerController(void* pvParams) {
   Timer.start();
   changeLampState(LampState::ACTIVE);
 
+  vTaskDelay(10);
+
   Timer.pause();
   changeLampState(LampState::PAUSED);         //pause timer after preheating
 
