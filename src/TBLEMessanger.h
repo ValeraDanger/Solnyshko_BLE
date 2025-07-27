@@ -15,7 +15,7 @@ extern DynamicJsonDocument status;
 #define RW_CHARACTERISTIC_UUID          "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 #define NF_CHARACTERISTIC_UUID          "1fd32b0a-aa51-4e49-92b2-9a8be97473c9"
 #define VERSION_CHARACTERISTIC_UUID     "b3103938-3c4c-4330-8f56-e58c77f4b0bd"
-#define BLE_NAME                        "Солнышко ОУФБ-04M"
+#define BLE_NAME                        "Coлнышкo ОУФБ-04МТ"
 
 class TBLEMessanger {
 private: 
