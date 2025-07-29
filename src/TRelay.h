@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include "LampStates.h"
 
-#define RELAY_PIN 22
+#define RELAY_PIN 18
 
 class TRelay {
 	public:
