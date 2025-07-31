@@ -60,6 +60,27 @@ void timerController(void* pvParams) {
   vTaskDelete(NULL);
 }
 
+TaskHandle_t testLampTaskHandler;
+void testLampController(void* pvParams) {
+  DynamicJsonDocument& command = *(DynamicJsonDocument*)pvParams;
+  uint32_t time = command["timer"]["time"].as<uint32_t>();
+
+  changeLampState(LampState::ACTIVE);
+  Timer.setTime(time);
+  Timer.start();
+
+  while(!Timer.tick()) {
+    vTaskDelay(5);
+  }
+
+  Timer.stop();
+  changeLampState(LampState::OFF);
+  Buzzer.pauseBeep();
+
+  testLampTaskHandler = NULL;
+  vTaskDelete(NULL);
+}
+
 TaskHandle_t inactivityTimerControllerTaskHandler;
 //TaskHandle_t* p_inactivityTimerControllerTaskHandler = &inactivityTimerControllerTaskHandler;
 void inactivityTimerController(void* pvParams) {
@@ -107,6 +128,12 @@ void proccessCommand(void* pvParams) {
           vTaskDelete(timerControllerTaskHandler);
           timerControllerTaskHandler = NULL;
         }
+
+        if (testLampTaskHandler != NULL) {
+          vTaskDelete(testLampTaskHandler);
+          testLampTaskHandler = NULL;
+        }
+
         Timer.inactivity_stop();
         Preheater.stop();
         Timer.stop();
@@ -123,6 +150,12 @@ void proccessCommand(void* pvParams) {
           vTaskDelete(timerControllerTaskHandler);
           timerControllerTaskHandler = NULL;
         }
+
+        if (testLampTaskHandler != NULL) {
+          vTaskDelete(testLampTaskHandler);
+          testLampTaskHandler = NULL;
+        }
+
         //Timer.inactivity_stop();
         Preheater.stop();
         Timer.stop();
@@ -142,6 +175,12 @@ void proccessCommand(void* pvParams) {
           vTaskDelete(timerControllerTaskHandler);
           timerControllerTaskHandler = NULL;
         }
+
+        if (testLampTaskHandler != NULL) {
+          vTaskDelete(testLampTaskHandler);
+          testLampTaskHandler = NULL;
+        }
+
         Timer.inactivity_stop();
         Preheater.stop();
         Timer.stop();
@@ -162,6 +201,12 @@ void proccessCommand(void* pvParams) {
           vTaskDelete(timerControllerTaskHandler);
           timerControllerTaskHandler = NULL;
         }
+
+        if (testLampTaskHandler != NULL) {
+          vTaskDelete(testLampTaskHandler);
+          testLampTaskHandler = NULL;
+        }
+
         Timer.inactivity_stop();
         Preheater.stop();
         Timer.stop();
@@ -181,6 +226,29 @@ void proccessCommand(void* pvParams) {
           Timer.resume();
           changeLampState(LampState::ACTIVE);
         }
+      }
+
+      else if ( !strcmp(command["timer"]["action"], "test") ) {
+        if (timerControllerTaskHandler != NULL) {
+          vTaskDelete(timerControllerTaskHandler);
+          timerControllerTaskHandler = NULL;
+        }
+        if (testLampTaskHandler != NULL) {
+          vTaskDelete(testLampTaskHandler);
+          testLampTaskHandler = NULL;
+        }
+        Timer.inactivity_stop();
+        Preheater.stop();
+        Timer.stop();
+
+        xTaskCreate(
+          testLampController,
+          "Test Lamp Task",
+          10000,
+          &command,
+          2,
+          &testLampTaskHandler
+        );
       }
     }
   }
