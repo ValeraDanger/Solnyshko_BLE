@@ -36,7 +36,7 @@ void timerController(void* pvParams) {
   Timer.setTime(total_cycles_time_left);
   total_cycles_time_left -= cycle_time;
   Timer.start();
-  changeLampState(LampState::ACTIVE);
+  //changeLampState(LampState::ACTIVE); if not commented - lamp will send several notifications
 
   vTaskDelay(10);
 
