@@ -73,16 +73,18 @@ uint32_t TTimer::getTime() {
 
 void TTimer::pause() {
     this->tmr.stop();
+    Relay.turnOff();
     status["timer"]["time_left"] = this->tmr.timeLeft();
     Buzzer.pauseBeep();
-    this->inactivity_start();
+    //this->inactivity_start();
     Serial.println("Timer paused");
 }
 
 void TTimer::resume() {
     this->tmr.resume();
     status["timer"]["time_left"] = this->tmr.timeLeft();
-    this->inactivity_stop();
+    Relay.turnOn();
+    //this->inactivity_stop();
     Serial.println("Timer resumed");
 }
 

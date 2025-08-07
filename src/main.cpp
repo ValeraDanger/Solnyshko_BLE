@@ -25,23 +25,11 @@ void timerController(void* pvParams) {
   status["timer"]["cycles"] = cycles_num;
   status["timer"]["cycle_time"] = cycle_time;
 
-  Preheater.start();
-  changeLampState(LampState::PREHEATING);
-  while (!Preheater.tick()) {       //while timer is not ended
-    vTaskDelay(5);
-  }
-  Preheater.stop();
-
   uint32_t total_cycles_time_left = cycle_time * cycles_num;
   Timer.setTime(total_cycles_time_left);
   total_cycles_time_left -= cycle_time;
   Timer.start();
-  //changeLampState(LampState::ACTIVE); if not commented - lamp will send several notifications
-
-  vTaskDelay(10);
-
-  Timer.pause();
-  changeLampState(LampState::PAUSED);         //pause timer after preheating
+  changeLampState(LampState::ACTIVE);
 
   while (!Timer.tick()) {       //while timer is not ended
     vTaskDelay(5);
@@ -134,7 +122,7 @@ void proccessCommand(void* pvParams) {
           testLampTaskHandler = NULL;
         }
 
-        Timer.inactivity_stop();
+        //Timer.inactivity_stop();
         Preheater.stop();
         Timer.stop();
 
@@ -181,7 +169,7 @@ void proccessCommand(void* pvParams) {
           testLampTaskHandler = NULL;
         }
 
-        Timer.inactivity_stop();
+        //Timer.inactivity_stop();
         Preheater.stop();
         Timer.stop();
 
@@ -207,7 +195,7 @@ void proccessCommand(void* pvParams) {
           testLampTaskHandler = NULL;
         }
 
-        Timer.inactivity_stop();
+        //Timer.inactivity_stop();
         Preheater.stop();
         Timer.stop();
 
@@ -237,7 +225,7 @@ void proccessCommand(void* pvParams) {
           vTaskDelete(testLampTaskHandler);
           testLampTaskHandler = NULL;
         }
-        Timer.inactivity_stop();
+        //Timer.inactivity_stop();
         Preheater.stop();
         Timer.stop();
 
